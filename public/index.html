@@ -1,0 +1,74 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>WhatsApp Funny Bot</title>
+  <style>
+    body { font-family: Arial; background: #111; color: #eee; padding: 20px; }
+    input, select, button { padding: 6px; margin: 6px; }
+    .section { margin-bottom: 30px; }
+    textarea { width: 100%; height: 100px; }
+  </style>
+</head>
+<body>
+  <h1>🤖 Create Your Funny WhatsApp Bot</h1>
+  <div class="section">
+    <h3>Create Bot</h3>
+    <form id="createForm">
+      Bot Name: <input type="text" id="botName"><br>
+      Admin Number: <input type="text" id="admin"><br>
+      Mode: 
+      <select id="mode">
+        <option value="funny">Funny</option>
+        <option value="rude">Rude</option>
+      </select><br>
+      Upload cred.json: <input type="file" id="cred"><br>
+      <button type="submit">Create Bot</button>
+    </form>
+    <div id="createResult"></div>
+  </div>
+
+  <div class="section">
+    <h3>Change Bot Mode</h3>
+    Task ID: <input type="text" id="taskId"><br>
+    Mode: 
+    <select id="newMode">
+      <option value="funny">Funny</option>
+      <option value="rude">Rude</option>
+    </select>
+    <button onclick="changeMode()">Change Mode</button>
+    <div id="modeResult"></div>
+  </div>
+
+  <script>
+    document.getElementById("createForm").onsubmit = async (e) => {
+      e.preventDefault();
+      const name = document.getElementById("botName").value;
+      const admin = document.getElementById("admin").value;
+      const mode = document.getElementById("mode").value;
+      const file = document.getElementById("cred").files[0];
+      const cred = await file.text();
+
+      const res = await fetch('/bot/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, admin, mode, cred })
+      });
+      const data = await res.json();
+      document.getElementById("createResult").innerText = `✅ Task ID: ${data.taskId}`;
+    };
+
+    async function changeMode() {
+      const taskId = document.getElementById("taskId").value;
+      const mode = document.getElementById("newMode").value;
+      const res = await fetch('/bot/mode', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ taskId, mode })
+      });
+      const data = await res.json();
+      document.getElementById("modeResult").innerText = data.success ? "✅ Mode Updated" : "❌ Error";
+    }
+  </script>
+</body>
+</html>
